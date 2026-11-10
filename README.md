@@ -32,6 +32,21 @@ any MapLibre GL JS app with the `pmtiles` protocol: the vector layers are `landc
 `building_points`, `structure_lines`, `landcover_points`, `place_names` and `admin_lines`, with
 N50's own attribute names (`objtype`, `hoyde`, `typeveg`, `vegkategori`, `vegnummer`, …).
 
+## Detail overlays
+
+Separate archives, each one **Overlay** tile source in OffARO (service type Vector, Overlay on),
+drawn over any base map. Each has its own release tag.
+
+| File | Release tag | Layer | Attributes | Zoom | Source |
+|---|---|---|---|---|---|
+| `norge-bygninger.pmtiles` | `buildings-<edition>` | `buildings` | `type` (Matrikkelen building type code), `cat` (residential · cabin · hut · outbuilding · farm · industry · commerce · public · other), `status` | 12–15 | Kartverket, *Matrikkelen - Bygningspunkt*, CC BY 4.0 |
+
+URL for a detail overlay:
+
+```
+pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<file>
+```
+
 ## Source data and build
 
 - Data: Kartverket, *N50 Kartdata* (Geonorge, FGDB, EPSG:25833, whole country), licence
@@ -39,9 +54,11 @@ N50's own attribute names (`objtype`, `hoyde`, `typeveg`, `vegkategori`, `vegnum
 - Build: GDAL `ogr2ogr` → GeoJSONSeq per layer → `tippecanoe` (z5–14, per-layer zoom filters,
   place names in a separate pass without density dropping) → `tile-join` → `pmtiles extract` for
   the North/South split. The script lives in OffARO's source tree as `scripts/vector-map/build-n50.sh`.
+- Buildings: Kartverket, *Matrikkelen - Bygningspunkt* (Geonorge, FGDB, CC BY 4.0) → `ogr2ogr`
+  (type, status, category) → `tippecanoe` z12–15; script `scripts/vector-map/build-buildings.sh`.
 
 ## Licence and attribution
 
-The archives are derived from N50 Kartdata and are published under the same licence,
+The archives are derived from Kartverket data (N50 Kartdata, Matrikkelen) and are published under the same licence,
 **Creative Commons Attribution 4.0** (CC BY 4.0). Attribute the data as **© Kartverket**.
 The archive metadata carries the same attribution and OffARO shows it on the map.
