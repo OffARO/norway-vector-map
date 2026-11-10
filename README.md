@@ -41,6 +41,7 @@ drawn over any base map. Each has its own release tag.
 |---|---|---|---|---|---|
 | `norge-bygninger.pmtiles` | `buildings-<edition>` | `buildings` | `type` (Matrikkelen building type code), `cat` (residential · cabin · hut · outbuilding · farm · industry · commerce · public · other), `status` | 12–15 | Kartverket, *Matrikkelen - Bygningspunkt*, CC BY 4.0 |
 | `norge-bygningsomriss.pmtiles` | `osm-buildings-<edition>` | `footprints` | `kind` (OSM `building=*` value), `name` | 13–16 | OpenStreetMap contributors, ODbL 1.0 |
+| `norge-turruter.pmtiles` | `trails-<edition>` | `trails` | `kind` (foot · ski · bike · other), `marked`, `name`, `grade` (G · B · R · S), `imp` (1 national · 2 regional · 3 local) | 8–14 | Kartverket, *Turrutebasen*, CC BY 4.0 |
 
 URL for a detail overlay:
 
@@ -60,10 +61,13 @@ pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<f
 - Building footprints: OpenStreetMap via Geofabrik `norway-latest.osm.pbf` → `osmium tags-filter`
   `wr/building` → `osmium export` (polygons, tags `building`, `name`) → `tippecanoe` z13–16; script
   `scripts/vector-map/build-osm-buildings.sh`.
+- Trails: Kartverket, *Turrutebasen* (Geonorge, FGDB, CC BY 4.0) → `ogr2ogr` into an indexed
+  GeoPackage (the route facts live in separate info tables) → one `trails` layer → `tippecanoe`
+  z8–14; script `scripts/vector-map/build-trails.sh`.
 
 ## Licence and attribution
 
-The archives are derived from Kartverket data (N50 Kartdata, Matrikkelen) and are published under the same licence,
+The archives are derived from Kartverket data (N50 Kartdata, Matrikkelen, Turrutebasen) and are published under the same licence,
 **Creative Commons Attribution 4.0** (CC BY 4.0). Attribute the data as **© Kartverket**.
 The archive metadata carries the same attribution and OffARO shows it on the map.
 
