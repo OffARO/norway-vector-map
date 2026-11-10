@@ -40,6 +40,7 @@ drawn over any base map. Each has its own release tag.
 | File | Release tag | Layer | Attributes | Zoom | Source |
 |---|---|---|---|---|---|
 | `norge-bygninger.pmtiles` | `buildings-<edition>` | `buildings` | `type` (Matrikkelen building type code), `cat` (residential · cabin · hut · outbuilding · farm · industry · commerce · public · other), `status` | 12–15 | Kartverket, *Matrikkelen - Bygningspunkt*, CC BY 4.0 |
+| `norge-bygningsomriss.pmtiles` | `osm-buildings-<edition>` | `footprints` | `kind` (OSM `building=*` value), `name` | 13–16 | OpenStreetMap contributors, ODbL 1.0 |
 
 URL for a detail overlay:
 
@@ -56,9 +57,16 @@ pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<f
   the North/South split. The script lives in OffARO's source tree as `scripts/vector-map/build-n50.sh`.
 - Buildings: Kartverket, *Matrikkelen - Bygningspunkt* (Geonorge, FGDB, CC BY 4.0) → `ogr2ogr`
   (type, status, category) → `tippecanoe` z12–15; script `scripts/vector-map/build-buildings.sh`.
+- Building footprints: OpenStreetMap via Geofabrik `norway-latest.osm.pbf` → `osmium tags-filter`
+  `wr/building` → `osmium export` (polygons, tags `building`, `name`) → `tippecanoe` z13–16; script
+  `scripts/vector-map/build-osm-buildings.sh`.
 
 ## Licence and attribution
 
 The archives are derived from Kartverket data (N50 Kartdata, Matrikkelen) and are published under the same licence,
 **Creative Commons Attribution 4.0** (CC BY 4.0). Attribute the data as **© Kartverket**.
 The archive metadata carries the same attribution and OffARO shows it on the map.
+
+The OSM footprints archive (`norge-bygningsomriss.pmtiles`, release tags `osm-buildings-*`) is a
+separate work under the [Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
+(ODbL), **© OpenStreetMap contributors**; it is never merged with the CC BY archives.
