@@ -43,6 +43,11 @@ drawn over any base map. Each has its own release tag.
 | `norge-bygningsomriss.pmtiles` | `osm-buildings-<edition>` | `footprints` | `kind` (OSM `building=*` value), `name` | 13–16 | OpenStreetMap contributors, ODbL 1.0 |
 | `norge-turruter.pmtiles` | `trails-<edition>` | `trails` | `kind` (foot · ski · bike · other), `marked`, `name`, `grade` (G · B · R · S), `imp` (1 national · 2 regional · 3 local) | 8–14 | Kartverket, *Turrutebasen*, CC BY 4.0 |
 | `norge-hoydekurver.pmtiles` | `terrain-contours-<edition>` | `contours` | `hoyde` (m, every 10 m), `major` (1 on the 50 m curves), `minz` (zoom gating 11/12/13) | 11–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
+| `norge-bratthet.pmtiles` | `terrain-slope-<edition>` | raster PNG, 256 px (no vector layer) | slope classes 25–30 / 30–35 / 35–40 / 40–45 / ≥45°, transparent below 25° | 8–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
+
+`norge-bratthet.pmtiles` is a raster archive (paletted PNG with alpha); OffARO reads the tile type
+from the PMTiles header and draws it as an image overlay, with the same Overlay switch and the
+row's opacity slider. The other archives are vector tiles.
 
 URL for a detail overlay:
 
@@ -69,6 +74,11 @@ pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<f
   cached as 25 km blocks (`scripts/vector-map/fetch-dtm.sh`) → `gdal_contour` every 10 m per block,
   simplified 2 m, 0 m curve dropped → `tippecanoe` z11–13 without density dropping
   (`scripts/vector-map/build-contours.sh`).
+- Slope: the same DTM blocks → `gdaldem slope` → class index 0–5 per 10 m cell (25/30/35/40/45°)
+  → per-block `gdalwarp` into the zoom-13 Web Mercator grid with majority (mode) resampling →
+  mosaic VRT with the palette (alpha included) → `gdal_translate` to MBTiles (PNG8) → majority
+  overviews to zoom 8 → `pmtiles convert` (`scripts/vector-map/build-slope.sh`, classes and
+  colours in `slope-classes.txt`).
 
 ## Licence and attribution
 
