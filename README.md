@@ -44,10 +44,12 @@ drawn over any base map. Each has its own release tag.
 | `norge-turruter.pmtiles` | `trails-<edition>` | `trails` | `kind` (foot · ski · bike · other), `marked`, `name`, `grade` (G · B · R · S), `imp` (1 national · 2 regional · 3 local) | 8–14 | Kartverket, *Turrutebasen*, CC BY 4.0 |
 | `norge-hoydekurver.pmtiles` | `terrain-contours-<edition>` | `contours` | `hoyde` (m, every 10 m), `major` (1 on the 50 m curves), `minz` (zoom gating 11/12/13) | 11–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
 | `norge-bratthet.pmtiles` | `terrain-slope-<edition>` | raster PNG, 256 px (no vector layer) | slope classes 25–30 / 30–35 / 35–40 / 40–45 / ≥45°, transparent below 25° | 8–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
+| `norge-skyggerelieff.pmtiles` | `terrain-hillshade-<edition>` | raster WebP, 256 px (no vector layer) | multidirectional hillshade, black with alpha 0–220, transparent on flat and lit ground | 5–12 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
 
-`norge-bratthet.pmtiles` is a raster archive (paletted PNG with alpha); OffARO reads the tile type
-from the PMTiles header and draws it as an image overlay, with the same Overlay switch and the
-row's opacity slider. The other archives are vector tiles.
+`norge-bratthet.pmtiles` (paletted PNG with alpha) and `norge-skyggerelieff.pmtiles` (WebP with
+alpha) are raster archives; OffARO reads the tile type from the PMTiles header and draws them as
+image overlays, with the same Overlay switch and the row's opacity slider. Tile overlays draw in
+the order of OffARO's Map Overlays list, top row on top. The other archives are vector tiles.
 
 URL for a detail overlay:
 
@@ -79,6 +81,11 @@ pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<f
   mosaic VRT with the palette (alpha included) → `gdal_translate` to MBTiles (PNG8) → majority
   overviews to zoom 8 → `pmtiles convert` (`scripts/vector-map/build-slope.sh`, classes and
   colours in `slope-classes.txt`).
+- Hillshade: the same DTM blocks, each read with a 2-cell margin from a whole-model VRT → `gdaldem
+  hillshade -multidirectional -z 1.3` → per-block `gdalwarp` into the zoom-12 Web Mercator grid
+  (cubic) → mosaic VRT rewritten to RGBA: black RGB and an alpha band mapping the grey shade to
+  0–220 in 32 steps (flat and lit = 0) → `gdal_translate` to MBTiles (WebP, quality 75) → averaged
+  overviews to zoom 5 → `pmtiles convert` (`scripts/vector-map/build-hillshade.sh`).
 
 ## Licence and attribution
 
