@@ -45,6 +45,7 @@ drawn over any base map. Each has its own release tag.
 | `norge-hoydekurver.pmtiles` | `terrain-contours-<edition>` | `contours` | `hoyde` (m, every 10 m), `major` (1 on the 50 m curves), `minz` (zoom gating 11/12/13) | 11–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
 | `norge-bratthet.pmtiles` | `terrain-slope-<edition>` | raster PNG, 256 px (no vector layer) | slope classes 25–30 / 30–35 / 35–40 / 40–45 / ≥45°, transparent below 25° | 8–13 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
 | `norge-skyggerelieff.pmtiles` | `terrain-hillshade-<edition>` | raster WebP, 256 px (no vector layer) | multidirectional hillshade, black with alpha 0–220, transparent on flat and lit ground | 5–12 | Kartverket, *Nasjonal detaljert høydemodell* (DTM 10 m), CC BY 4.0 |
+| `norge-dybder.pmtiles` | `depths-<edition>` | `depth_contours` · `depth_areas` · `hazards` · `intertidal` · `soundings` | `dybde` (m), `major` (1 on 10/20/50/100/200/500/1000 m), `minz` (8/10/12); `maxd`, `mind` (m, bands ≤ 20 m); `kind` (rock · dry · shoal), `dybde`; `dybde` (m, soundings ≤ 30 m, zoom 13–14) | 8–14 | Kartverket, *Sjøkart – Dybdedata*, CC BY 4.0 (not for navigation) |
 
 `norge-bratthet.pmtiles` (paletted PNG with alpha) and `norge-skyggerelieff.pmtiles` (WebP with
 alpha) are raster archives; OffARO reads the tile type from the PMTiles header and draws them as
@@ -86,6 +87,10 @@ pmtiles://https://github.com/OffARO/norway-vector-map/releases/download/<tag>/<f
   (cubic) → mosaic VRT rewritten to RGBA: black RGB and an alpha band mapping the grey shade to
   0–220 in 32 steps (flat and lit = 0) → `gdal_translate` to MBTiles (WebP, quality 75) → averaged
   overviews to zoom 5 → `pmtiles convert` (`scripts/vector-map/build-hillshade.sh`).
+- Depths: Kartverket, *Sjøkart – Dybdedata* (Geonorge, FGDB, CC BY 4.0) → `ogr2ogr` SQLite-dialect
+  exports per layer (contours with `major`/`minz`, depth bands to 20 m, rocks / drying rocks /
+  shoals, drying banks, soundings to 30 m) → one `tippecanoe` run z8–14 with per-layer zoom gating
+  (`scripts/vector-map/build-depths.sh`). The dataset is one seamless mosaic, nothing is deduplicated.
 
 ## Licence and attribution
 
